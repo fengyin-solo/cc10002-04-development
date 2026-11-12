@@ -33,3 +33,74 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+
+/* 页签 */
+.tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+.tab-item { border: none; background: none; padding: 8px 14px; cursor: pointer; font-size: 13px; color: var(--muted); border-bottom: 2px solid transparent; }
+.tab-item.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+
+/* 徽章与状态 */
+.badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; margin-right: 4px; border: 1px solid transparent; }
+.badge.ok { background: #ecfdf3; color: #027a48; border-color: #a6f4c5; }
+.badge.warn { background: #fffaeb; color: #b54708; border-color: #fedf89; }
+.badge.danger { background: #fef3f2; color: #b42318; border-color: #fecdca; }
+.badge.muted { background: #f2f4f7; color: #475467; border-color: #e4e7ec; }
+.link.danger { color: #b42318; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-block; background: #f2f4f7; border: 1px solid #e4e7ec; border-radius: 10px; padding: 1px 8px; font-size: 12px; color: #475467; margin: 2px 4px 2px 0; }
+
+/* 面板 */
+.panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.panel-head h3 { margin: 0; font-size: 14px; }
+.panel-block { margin-top: 14px; }
+.panel-block h3 { font-size: 14px; margin: 0 0 8px; }
+.panel-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 13px; }
+.hint { color: var(--muted); font-size: 12px; }
+.notice { border-radius: 6px; padding: 10px 12px; margin: 8px 0; font-size: 13px; }
+.notice.ok { background: #ecfdf3; border: 1px solid #a6f4c5; }
+.notice.danger { background: #fef3f2; border: 1px solid #fecdca; }
+.notice.muted { background: #f8fafc; border: 1px solid var(--border); }
+.notice p { margin: 4px 0; }
+.conflict-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px dashed #fecdca; flex-wrap: wrap; }
+.conflict-message { flex: 1; min-width: 260px; }
+.conflict-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.publish-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.scope-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.scope-toggle button { border: none; background: #fff; padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--muted); }
+.scope-toggle button.active { background: var(--brand); color: #fff; }
+.row-selected td { background: #f0f6ff; }
+.path-cell { font-family: ui-monospace, monospace; font-size: 12px; max-width: 420px; }
+.path-sample { padding: 2px 0; color: var(--muted); }
+
+/* 弹窗 */
+.modal-mask { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; z-index: 30; }
+.modal { background: #fff; border-radius: 10px; padding: 18px 20px; width: 720px; max-width: 94vw; max-height: 88vh; overflow: auto; }
+.modal h3 { margin: 0 0 12px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.modal-side { display: contents; }
+.modal-actions { margin-top: 14px; justify-content: flex-end; }
+.filter-item select, .filter-item input { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 13px; min-width: 180px; background: #fff; }
+td input, td select { border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font-size: 13px; width: 100%; }
+
+/* 血缘影响图 */
+.graph-scroll { overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: #fbfcfe; }
+.lineage-graph { display: block; }
+.graph-node rect { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+.graph-node.text-node rect { stroke-dasharray: 5 4; fill: #fafafa; }
+.graph-node.conflicted rect { stroke: #dc2626; stroke-width: 2; }
+.graph-node.impacted rect { stroke: var(--brand); stroke-width: 2; }
+.graph-node-title { font-size: 13px; font-weight: 600; fill: #1f2937; }
+.graph-node-sub { font-size: 11px; fill: #64748b; }
+.graph-field { cursor: pointer; }
+.graph-field rect { fill: #f1f5f9; stroke: none; }
+.graph-field:hover rect { fill: #dbeafe; }
+.graph-field.selected rect { fill: #bfdbfe; stroke: var(--brand); }
+.graph-field-name { font-size: 11px; fill: #1f2937; }
+.graph-field-role { font-size: 10px; fill: #64748b; }
+.graph-edge path { stroke: #94a3b8; stroke-width: 1.4; }
+.graph-edge.conflicted path { stroke: #dc2626; stroke-width: 2; }
+.graph-edge.disabled path { stroke-dasharray: 6 4; opacity: 0.55; }
+.graph-edge.impacted path { stroke: var(--brand); stroke-width: 2; }
+.graph-edge-label { font-size: 10px; fill: #64748b; }
+.graph-edge.conflicted .graph-edge-label { fill: #dc2626; }

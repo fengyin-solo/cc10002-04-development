@@ -1,9 +1,10 @@
-"""数据建模接口：维护模型定义，覆盖提交审核、生效发布、废弃下线等动作。"""
+"""数据建模接口：模型定义维护、字段版本化变更与版本历史。"""
 from __future__ import annotations
 
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 
 from app.schemas import ActionResult, EntryPayload, PageResult
 from app.services.datamodel import DatamodelService
@@ -14,6 +15,14 @@ service = DatamodelService()
 
 LIST_FIELDS = ["模型编号", "模型名称", "事实表名", "关联维度", "度量列定义", "分区字段", "增量键", "刷新周期"]
 STATUSES = ["草稿", "待审核", "已生效", "已废弃"]
+
+
+class FieldsPayload(BaseModel):
+    """字段变更：base_version 用于并发裁决，只接受基于当前版本的修改。"""
+
+    base_version: int
+    fields: list[dict[str, Any]] = Field(default_factory=list)
+    remark: str | None = None
 
 
 @router.get("", response_model=PageResult[dict])
@@ -30,13 +39,35 @@ def list_entries(
     return PageResult(items=items, total=total, page=page, size=size)
 
 
+@router.get("/export")
+def export_entries() -> dict[str, Any]:
+    """导出数据建模清单：返回当前过滤条件下的全量数据。"""
+    items, total = service.list_entries(page=1, size=10000)
+    return {"module": "datamodel", "total": total, "items": items}
+
+
 @router.get("/{entry_id}", response_model=dict)
 def get_entry(entry_id: int) -> dict:
-    """读取单条模型定义明细；不存在时给出可读的错误说明。"""
+    """读取单条模型定义明细（含结构化字段与当前版本）；不存在时给出可读的错误说明。"""
     entry = service.get_entry(entry_id)
     if entry is None:
         raise HTTPException(status_code=404, detail=f"模型定义 {entry_id} 不存在或已归档")
     return entry
+
+
+@router.get("/{entry_id}/versions")
+def list_versions(entry_id: int) -> dict[str, Any]:
+    """模型字段的版本历史：每次变更记录基准版本与被删字段。"""
+    versions = service.list_versions(entry_id)
+    if versions is None:
+        raise HTTPException(status_code=404, detail=f"模型定义 {entry_id} 不存在或已归档")
+    return {"items": versions}
+
+
+@router.put("/{entry_id}/fields")
+def update_fields(entry_id: int, payload: FieldsPayload) -> dict[str, Any]:
+    """字段变更：版本不一致或会让生效血缘指向不存在字段时整组拒绝。"""
+    return service.update_fields(entry_id, payload.base_version, payload.fields, payload.remark)
 
 
 @router.post("", response_model=ActionResult)
@@ -50,16 +81,9 @@ def create_entry(payload: EntryPayload) -> ActionResult:
 
 @router.post("/{entry_id}/actions", response_model=ActionResult)
 def run_action(entry_id: int, payload: EntryPayload) -> ActionResult:
-    """对单条模型定义执行提交审核、生效发布、废弃下线；不允许的动作会被拦下并说明原因。"""
+    """对单条模型定义执行提交审核、生效发布、废弃下线；被生效血缘引用的模型不能废弃。"""
     action = str(payload.values.get("action") or "").strip()
     entry, message = service.run_action(entry_id, action)
     if entry is None:
         return ActionResult(ok=False, message=message)
     return ActionResult(ok=True, message=message, entry=entry)
-
-
-@router.get("/export")
-def export_entries() -> dict[str, Any]:
-    """导出数据建模清单：返回当前过滤条件下的全量数据。"""
-    items, total = service.list_entries(page=1, size=10000)
-    return {"module": "datamodel", "total": total, "items": items}
